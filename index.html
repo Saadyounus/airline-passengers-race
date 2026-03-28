@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airline Passengers Race 2005–2024</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f0;
+    --muted: rgba(255,255,255,0.38);
+    --subtle: rgba(255,255,255,0.12);
+    --accent: #4a9eff;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 3rem;
+  }
+
+  header {
+    width: 100%;
+    max-width: 820px;
+    margin-bottom: 2.4rem;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 4vw, 2.4rem);
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 0.6rem;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 540px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 820px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.8rem 2rem;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.6rem;
+    flex-wrap: wrap;
+  }
+
+  button#pbtn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    letter-spacing: 0.02em;
+  }
+  button#pbtn:hover { opacity: 0.85; }
+
+  select#spd {
+    background: rgba(255,255,255,0.07);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .progress-bar {
+    flex: 1;
+    min-width: 120px;
+    height: 3px;
+    background: var(--subtle);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  #chart-area {
+    position: relative;
+    height: 380px;
+    overflow: hidden;
+  }
+
+  #year-stamp {
+    position: absolute;
+    bottom: -6px;
+    right: 0;
+    font-size: 88px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.13);
+    line-height: 1;
+    pointer-events: none;
+    z-index: 10;
+    letter-spacing: -2px;
+    user-select: none;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 36px;
+    position: absolute;
+    width: calc(100% - 100px);
+    z-index: 1;
+    transition: top 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rnk {
+    font-size: 10px;
+    color: var(--muted);
+    width: 14px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .lbl {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    width: 134px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .trk {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    height: 26px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fil {
+    height: 100%;
+    border-radius: 4px;
+    position: absolute;
+    left: 0; top: 0;
+    transition: width 0.05s linear;
+  }
+
+  .val {
+    font-size: 11px;
+    color: var(--muted);
+    width: 46px;
+    text-align: right;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  footer {
+    width: 100%;
+    max-width: 820px;
+    margin-top: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .source {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .credit {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .credit a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .credit a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Data Visualisation · Aviation</div>
+  <h1>The Global Airline Passenger Race</h1>
+  <p class="subtitle">20 years of aviation history — tracking the world's busiest airlines by passengers carried from 2005 to 2024. Watch how COVID reshaped the industry overnight.</p>
+</header>
+
+<div class="card">
+  <div class="controls">
+    <button id="pbtn">▶ Play</button>
+    <select id="spd">
+      <option value="8000">Slow</option>
+      <option value="5000" selected>Normal</option>
+      <option value="2500">Fast</option>
+    </select>
+    <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+    <span id="slbl" style="font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:32px;">2005</span>
+  </div>
+
+  <div id="chart-area">
+    <div id="year-stamp">2005</div>
+  </div>
+</div>
+
+<footer>
+  <span class="source">Sources: IATA, airline annual reports &amp; Wikipedia · Passengers in millions</span>
+  <span class="credit">Built by <a href="https://saadyounus.github.io" target="_blank">Saad Younus</a></span>
+</footer>
+
+<script>
+const RAW = {
+  2005:{"American Airlines":98,"Delta Air Lines":86,"Southwest Airlines":77,"United Airlines":75,"Lufthansa":52,"Air France":49,"Ryanair":35,"Emirates":17,"Qatar Airways":8,"Etihad Airways":2,"Turkish Airlines":24,"China Southern":43},
+  2006:{"American Airlines":99,"Delta Air Lines":73,"Southwest Airlines":83,"United Airlines":71,"Lufthansa":56,"Air France":49,"Ryanair":40,"Emirates":21,"Qatar Airways":10,"Etihad Airways":3,"Turkish Airlines":28,"China Southern":53},
+  2007:{"American Airlines":101,"Delta Air Lines":73,"Southwest Airlines":88,"United Airlines":69,"Lufthansa":63,"Air France":56,"Ryanair":50,"Emirates":23,"Qatar Airways":12,"Etihad Airways":5,"Turkish Airlines":30,"China Southern":60},
+  2008:{"American Airlines":92,"Delta Air Lines":105,"Southwest Airlines":88,"United Airlines":67,"Lufthansa":70,"Air France":74,"Ryanair":58,"Emirates":27,"Qatar Airways":14,"Etihad Airways":6,"Turkish Airlines":33,"China Southern":66},
+  2009:{"American Airlines":86,"Delta Air Lines":102,"Southwest Airlines":86,"United Airlines":55,"Lufthansa":65,"Air France":71,"Ryanair":65,"Emirates":31,"Qatar Airways":16,"Etihad Airways":7,"Turkish Airlines":33,"China Southern":68},
+  2010:{"American Airlines":86,"Delta Air Lines":111,"Southwest Airlines":88,"United Airlines":89,"Lufthansa":72,"Air France":70,"Ryanair":73,"Emirates":36,"Qatar Airways":18,"Etihad Airways":9,"Turkish Airlines":39,"China Southern":76},
+  2011:{"American Airlines":86,"Delta Air Lines":114,"Southwest Airlines":103,"United Airlines":140,"Lufthansa":76,"Air France":75,"Ryanair":76,"Emirates":39,"Qatar Airways":21,"Etihad Airways":11,"Turkish Airlines":42,"China Southern":86},
+  2012:{"American Airlines":87,"Delta Air Lines":116,"Southwest Airlines":112,"United Airlines":140,"Lufthansa":78,"Air France":77,"Ryanair":79,"Emirates":43,"Qatar Airways":24,"Etihad Airways":13,"Turkish Airlines":46,"China Southern":92},
+  2013:{"American Airlines":143,"Delta Air Lines":120,"Southwest Airlines":115,"United Airlines":139,"Lufthansa":82,"Air France":79,"Ryanair":81,"Emirates":47,"Qatar Airways":26,"Etihad Airways":14,"Turkish Airlines":51,"China Southern":100},
+  2014:{"American Airlines":148,"Delta Air Lines":129,"Southwest Airlines":129,"United Airlines":138,"Lufthansa":84,"Air France":83,"Ryanair":86,"Emirates":49,"Qatar Airways":28,"Etihad Airways":15,"Turkish Airlines":55,"China Southern":109},
+  2015:{"American Airlines":146,"Delta Air Lines":138,"Southwest Airlines":144,"United Airlines":140,"Lufthansa":88,"Air France":89,"Ryanair":101,"Emirates":51,"Qatar Airways":30,"Etihad Airways":17,"Turkish Airlines":61,"China Southern":120},
+  2016:{"American Airlines":144,"Delta Air Lines":143,"Southwest Airlines":151,"United Airlines":143,"Lufthansa":93,"Air France":93,"Ryanair":117,"Emirates":55,"Qatar Airways":34,"Etihad Airways":18,"Turkish Airlines":62,"China Southern":133},
+  2017:{"American Airlines":198,"Delta Air Lines":186,"Southwest Airlines":158,"United Airlines":148,"Lufthansa":101,"Air France":98,"Ryanair":130,"Emirates":58,"Qatar Airways":37,"Etihad Airways":18,"Turkish Airlines":68,"China Southern":143},
+  2018:{"American Airlines":203,"Delta Air Lines":192,"Southwest Airlines":163,"United Airlines":158,"Lufthansa":107,"Air France":101,"Ryanair":139,"Emirates":59,"Qatar Airways":36,"Etihad Airways":17,"Turkish Airlines":75,"China Southern":153},
+  2019:{"American Airlines":215,"Delta Air Lines":204,"Southwest Airlines":162,"United Airlines":162,"Lufthansa":109,"Air France":104,"Ryanair":152,"Emirates":56,"Qatar Airways":33,"Etihad Airways":17,"Turkish Airlines":74,"China Southern":152},
+  2020:{"American Airlines":95,"Delta Air Lines":91,"Southwest Airlines":68,"United Airlines":67,"Lufthansa":36,"Air France":33,"Ryanair":27,"Emirates":16,"Qatar Airways":16,"Etihad Airways":5,"Turkish Airlines":28,"China Southern":84},
+  2021:{"American Airlines":165,"Delta Air Lines":134,"Southwest Airlines":122,"United Airlines":105,"Lufthansa":47,"Air France":46,"Ryanair":97,"Emirates":29,"Qatar Airways":22,"Etihad Airways":9,"Turkish Airlines":56,"China Southern":109},
+  2022:{"American Airlines":199,"Delta Air Lines":183,"Southwest Airlines":157,"United Airlines":144,"Lufthansa":85,"Air France":83,"Ryanair":168,"Emirates":44,"Qatar Airways":32,"Etihad Airways":13,"Turkish Airlines":83,"China Southern":130},
+  2023:{"American Airlines":212,"Delta Air Lines":196,"Southwest Airlines":157,"United Airlines":165,"Lufthansa":103,"Air France":101,"Ryanair":185,"Emirates":52,"Qatar Airways":40,"Etihad Airways":17,"Turkish Airlines":83,"China Southern":155},
+  2024:{"American Airlines":218,"Delta Air Lines":200,"Southwest Airlines":152,"United Airlines":172,"Lufthansa":106,"Air France":104,"Ryanair":200,"Emirates":52,"Qatar Airways":40,"Etihad Airways":20,"Turkish Airlines":88,"China Southern":162}
+};
+
+const COLORS = {
+  "American Airlines":"#4a9eff","Delta Air Lines":"#e05252","Southwest Airlines":"#f0903a",
+  "United Airlines":"#a47bd4","Lufthansa":"#8ab4c8","Air France":"#e86c6c",
+  "Ryanair":"#3abf9e","Emirates":"#d44f4f","Qatar Airways":"#b04060",
+  "Etihad Airways":"#c9a83c","Turkish Airlines":"#e84545","China Southern":"#5b9bd5"
+};
+
+const YEARS = Object.keys(RAW).map(Number);
+const TOP = 10;
+const ROW_H = 37;
+let rafId = null, playing = false, startTs = null;
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function getFrame(t) {
+  const yi = Math.min(Math.floor(t), YEARS.length - 2);
+  const frac = Math.min(t - yi, 1);
+  const yA = YEARS[yi], yB = YEARS[Math.min(yi + 1, YEARS.length - 1)];
+  const vals = {};
+  Object.keys(RAW[2005]).forEach(a => { vals[a] = lerp(RAW[yA][a] || 0, RAW[yB][a] || 0, frac); });
+  return { vals, year: lerp(yA, yB, frac) };
+}
+
+const chart = document.getElementById('chart-area');
+const yearStamp = document.getElementById('year-stamp');
+const slbl = document.getElementById('slbl');
+const prog = document.getElementById('prog');
+const rows = {};
+
+Object.keys(RAW[2005]).forEach(airline => {
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.style.cssText = 'top:0;opacity:0;';
+  div.innerHTML = `<div class="rnk"></div><div class="lbl" title="${airline}">${airline}</div><div class="trk"><div class="fil" style="background:${COLORS[airline]||'#888'};width:0%"></div></div><div class="val"></div>`;
+  chart.appendChild(div);
+  rows[airline] = div;
+});
+
+function renderFrame(frame) {
+  const { vals, year } = frame;
+  const sorted = Object.entries(vals).sort((a, b) => b[1] - a[1]);
+  const maxVal = sorted[0][1];
+  const topN = sorted.slice(0, TOP);
+  const topSet = new Set(topN.map(x => x[0]));
+
+  topN.forEach(([airline, val], rank) => {
+    const row = rows[airline];
+    row.style.top = (rank * ROW_H) + 'px';
+    row.style.opacity = '1';
+    row.querySelector('.fil').style.width = ((val / maxVal) * 100).toFixed(2) + '%';
+    row.querySelector('.val').textContent = Math.round(val) + 'M';
+    row.querySelector('.rnk').textContent = rank + 1;
+  });
+
+  Object.keys(rows).forEach(a => { if (!topSet.has(a)) rows[a].style.opacity = '0'; });
+
+  const yr = Math.floor(year);
+  yearStamp.textContent = yr;
+  slbl.textContent = yr;
+
+  const pct = ((year - YEARS[0]) / (YEARS[YEARS.length - 1] - YEARS[0]) * 100).toFixed(1);
+  prog.style.width = pct + '%';
+}
+
+function tick(ts) {
+  if (!startTs) startTs = ts;
+  const spd = parseInt(document.getElementById('spd').value);
+  const t = (ts - startTs) / spd;
+  renderFrame(getFrame(Math.min(t, YEARS.length - 1)));
+  if (t < YEARS.length - 1) {
+    rafId = requestAnimationFrame(tick);
+  } else {
+    playing = false;
+    document.getElementById('pbtn').textContent = '↺ Replay';
+  }
+}
+
+function startPlay() {
+  playing = true; startTs = null;
+  document.getElementById('pbtn').textContent = '⏸ Pause';
+  rafId = requestAnimationFrame(tick);
+}
+
+function pausePlay() {
+  playing = false;
+  cancelAnimationFrame(rafId);
+  document.getElementById('pbtn').textContent = '▶ Play';
+}
+
+document.getElementById('pbtn').addEventListener('click', () => {
+  if (playing) { pausePlay(); } else { startPlay(); }
+});
+
+document.getElementById('spd').addEventListener('change', () => {
+  if (playing) { pausePlay(); startPlay(); }
+});
+
+renderFrame(getFrame(0));
+</script>
+</body>
+</html>
